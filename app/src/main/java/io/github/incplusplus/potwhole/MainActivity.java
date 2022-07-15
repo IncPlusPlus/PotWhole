@@ -1,37 +1,30 @@
 package io.github.incplusplus.potwhole;
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import com.google.android.material.navigation.NavigationBarView;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
+import com.google.android.material.navigation.NavigationBarView;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
-
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "Map";
@@ -49,11 +42,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean locationPermissionGranted;
     private Location lastKnownLocation;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // Set the container in activity_main to the map fragment on startup
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
@@ -99,30 +92,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        //check permissions
+        // check permissions
         getLocationPermission();
         this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container, mapFragment)
-                .commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.container, mapFragment).commit();
 
         mapFragment.getMapAsync(this);
-
     }
 
-    private void configMap(){
+    private void configMap() {
         this.map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
 
     /**
      * Reads a property from local.properties file given a key
+     *
      * @param key, key of a value in local.properties
      * @return String, value corresponding to the key, if it is not found returns empty string
      */
-    private String getProperty(String key){
+    private String getProperty(String key) {
         try {
             Properties properties = new Properties();
             FileInputStream inputStream = new FileInputStream("local.properties");
@@ -139,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /**
      * Loads when map is ready to be used
+     *
      * @param googleMap, GoogleMap object to set as the map in this class
      */
     @Override
@@ -148,107 +139,107 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getDeviceLocation();
     }
-    /**
-     * Updates map to be set to current location and enable my location button.
-     *
-     */
+    /** Updates map to be set to current location and enable my location button. */
     private void updateLocationUI() {
         try {
-            //check location permissions
+            // check location permissions
             if (locationPermissionGranted) {
-                //enable location
+                // enable location
                 map.setMyLocationEnabled(true);
 
-                //enable button
+                // enable button
                 map.getUiSettings().setMyLocationButtonEnabled(true);
             }
-            //if not allowed
+            // if not allowed
             else {
-                //disable location
+                // disable location
                 map.setMyLocationEnabled(false);
-                //disable button
+                // disable button
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-                //cannot get location, so location is null
+                // cannot get location, so location is null
                 this.lastKnownLocation = null;
 
-                //request permissions
+                // request permissions
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e(TAG, e.getMessage());
         }
     }
-    /**
-     * Gets the most recent location of the device
-     */
+    /** Gets the most recent location of the device */
     private void getDeviceLocation() {
-        //Get the most recent location of the phone
+        // Get the most recent location of the phone
         try {
             if (locationPermissionGranted) {
-                //location permission allowed
+                // location permission allowed
                 Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            lastKnownLocation = task.getResult();
-                            if (lastKnownLocation != null) {
-                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                locationResult.addOnCompleteListener(
+                        this,
+                        new OnCompleteListener<Location>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Location> task) {
+                                if (task.isSuccessful()) {
+                                    // Set the map's camera position to the current location of the
+                                    // device.
+                                    lastKnownLocation = task.getResult();
+                                    if (lastKnownLocation != null) {
+                                        map.moveCamera(
+                                                CameraUpdateFactory.newLatLngZoom(
+                                                        new LatLng(
+                                                                lastKnownLocation.getLatitude(),
+                                                                lastKnownLocation.getLongitude()),
+                                                        DEFAULT_ZOOM));
+                                    }
+                                } else {
+                                    // location permission not allowed
+                                    Log.d(TAG, "Current location is null");
+                                    Log.e(TAG, "Exception: %s", task.getException());
+                                    map.moveCamera(
+                                            CameraUpdateFactory.newLatLngZoom(
+                                                    defaultLocation, DEFAULT_ZOOM));
+                                    map.getUiSettings().setMyLocationButtonEnabled(false);
+                                }
                             }
-                        }
-                        else {
-                            //location permission not allowed
-                            Log.d(TAG, "Current location is null");
-                            Log.e(TAG, "Exception: %s", task.getException());
-                            map.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
-                            map.getUiSettings().setMyLocationButtonEnabled(false);
-                        }
-                    }
-                });
+                        });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
-    /**
-     * Requests for permissions if they are not already allowed
-     */
+    /** Requests for permissions if they are not already allowed */
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(
+                        this.getApplicationContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
     /**
      * Handles results from the request permission pop up
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
-
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         locationPermissionGranted = false;
         if (requestCode
-                == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {// If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) { // If request is cancelled, the
+            // result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationPermissionGranted = true;
             }
         } else {
