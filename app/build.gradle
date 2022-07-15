@@ -15,8 +15,12 @@ android {
         versionCode 1
         versionName "1.0"
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        manifestPlaceholders = [MAPS_API_KEY: "${properties.getProperty('MAPS_API_KEY')}"]
+        if (rootProject.file('local.properties').canRead()) {
+            properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        }
+        var resolvedMapKey = properties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY")
+        println "Maps API key present and valid: " + (resolvedMapKey instanceof String && !resolvedMapKey.isAllWhitespace())
+        manifestPlaceholders = [MAPS_API_KEY: resolvedMapKey]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
