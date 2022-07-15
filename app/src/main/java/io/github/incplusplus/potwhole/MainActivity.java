@@ -15,6 +15,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,15 +48,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set the container in activity_main to the map fragment on startup
-        if (savedInstanceState == null) {
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction transaction = fm.beginTransaction();
-            Fragment mapFragment = new MapFragment();
-            transaction.replace(R.id.container, mapFragment);
-            transaction.commit();
-        }
-
+        SupportMapFragment mapFragment = getSupportMapFragment();
         NavigationBarView navBar = findViewById(R.id.bottom_navigation);
         navBar.setOnItemSelectedListener(
                 item -> {
@@ -68,8 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                      * in switch case statements". As such, we're required to use an if/else block.
                      */
                     if (itemId == R.id.page_map) {
-                        Fragment mapFragment = new MapFragment();
-                        transaction.replace(R.id.container, mapFragment);
+                        transaction.replace(R.id.container, getSupportMapFragment());
                         transaction.commit();
                         return true;
                     } else if (itemId == R.id.page_reports) {
@@ -92,18 +84,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
+    }
+
+    @NonNull
+    private SupportMapFragment getSupportMapFragment() {
+        GoogleMapOptions mapOptions = configMap();
+
         // check permissions
         getLocationPermission();
         this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance(mapOptions);
         getSupportFragmentManager().beginTransaction().add(R.id.container, mapFragment).commit();
 
         mapFragment.getMapAsync(this);
+        return mapFragment;
     }
 
-    private void configMap() {
-        this.map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+    /***
+     * Configure a mapOptions object for initializing a map
+     * @return mapOptions
+     */
+    private GoogleMapOptions configMap() {
+        GoogleMapOptions mapOptions = new GoogleMapOptions();
+        mapOptions.mapType(GoogleMap.MAP_TYPE_NORMAL);
+        mapOptions.ambientEnabled(true);
+        mapOptions.compassEnabled(true);
+        mapOptions.zoomGesturesEnabled(true);
+        mapOptions.scrollGesturesEnabledDuringRotateOrZoom(true);
+        mapOptions.scrollGesturesEnabled(true);
+
+        return mapOptions;
     }
 
     /**
@@ -136,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.map = googleMap;
         updateLocationUI();
-
         getDeviceLocation();
     }
     /** Updates map to be set to current location and enable my location button. */
