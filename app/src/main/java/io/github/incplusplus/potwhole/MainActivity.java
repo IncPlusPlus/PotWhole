@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "PotWhole";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
