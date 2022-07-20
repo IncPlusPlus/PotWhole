@@ -10,16 +10,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
- * A simple {@link Fragment} subclass. Use the  factory method
- * to create an instance of this fragment.
+ * A simple {@link Fragment} subclass. Use the factory method to create an instance of this
+ * fragment.
  */
 public class MyAccountFragment extends Fragment {
 
@@ -39,7 +37,6 @@ public class MyAccountFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
-
     }
 
     @Override
@@ -119,8 +116,6 @@ public class MyAccountFragment extends Fragment {
                             startActivity(intent);
                         })
                 .addOnFailureListener(
-                        e -> Log.w("AUTH_INFO", "signInWithEmailAndPassword:failure", e)
-
-                );
+                        e -> Log.w("AUTH_INFO", "signInWithEmailAndPassword:failure", e));
     }
 }
