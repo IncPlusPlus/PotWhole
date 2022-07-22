@@ -36,6 +36,9 @@ proguard/
 # Android Studio captures folder
 captures/
 
+# Firestore Folder
+Firestore/
+
 # IntelliJ
 *.iml
 .idea
