@@ -9,13 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,14 +25,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Objects;
-import java.util.concurrent.Executor;
-
 /**
  * A simple {@link Fragment} subclass. Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment  implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,11 +57,9 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
     private SupportMapFragment supportMapFragment;
     private Context context;
 
-    public MapFragment() {
+    public MapFragment() {}
 
-    }
-
-    public SupportMapFragment getSupportMapFragment(){
+    public SupportMapFragment getSupportMapFragment() {
         return this.supportMapFragment;
     }
 
@@ -103,7 +95,8 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
         GoogleMapOptions mapOptions = configMap();
         // check permissions
         getLocationPermission();
-        this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        this.fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity());
         SupportMapFragment mapFragment = SupportMapFragment.newInstance(mapOptions);
         mapFragment.getMapAsync(this);
         return mapFragment;
@@ -117,8 +110,8 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
          * onRequestPermissionsResult.
          */
         if (ContextCompat.checkSelfPermission(
-                context.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        context.getApplicationContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
         } else {
@@ -173,8 +166,12 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
     private void updateLocationUI() {
         try {
             // check location permissions
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            &&  ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                                    context, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(
+                                    context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
                 // enable location
                 map.setMyLocationEnabled(true);
 
@@ -227,7 +224,8 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         this.context = getActivity();
@@ -235,14 +233,18 @@ public class MapFragment extends Fragment  implements OnMapReadyCallback {
         supportMapFragment.getMapAsync(this);
 
         FloatingActionButton button = container.findViewById(R.id.new_report_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO add camera functionality
-            }
-        });
+        button.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO add camera functionality
+                    }
+                });
 
-        getChildFragmentManager().beginTransaction().add(R.id.map_fragment, supportMapFragment).commit();
+        getChildFragmentManager()
+                .beginTransaction()
+                .add(R.id.map_fragment, supportMapFragment)
+                .commit();
         return view;
     }
 }
