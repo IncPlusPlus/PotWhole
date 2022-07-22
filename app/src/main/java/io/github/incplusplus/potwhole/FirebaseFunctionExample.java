@@ -1,18 +1,14 @@
 package io.github.incplusplus.potwhole;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.gson.Gson;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +39,6 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                 v -> {
                     getReport();
                 });
-
     }
 
     private void createReport() {
@@ -70,27 +65,36 @@ public class FirebaseFunctionExample extends AppCompatActivity {
 
         Log.v("REPORT_CREATE", "Creating report in database...");
 
-        mFunctions.getHttpsCallable("createReportDocument").call(jsonData).addOnFailureListener(e -> {
+        mFunctions
+                .getHttpsCallable("createReportDocument")
+                .call(jsonData)
+                .addOnFailureListener(
+                        e -> {
+                            Log.v("REPORT_CREATE", "Creating Report Document Failed");
+                            Log.v("REPORT_CREATE", "Exception - " + e);
+                        })
+                .addOnSuccessListener(
+                        httpsCallableResult -> {
+                            Log.v("REPORT_CREATE", "Creating Report Document Successful");
+                            Log.v(
+                                    "REPORT_CREATE",
+                                    "Return From Database - "
+                                            + httpsCallableResult.getData().toString());
 
-            Log.v("REPORT_CREATE", "Creating Report Document Failed");
-            Log.v("REPORT_CREATE", "Exception - " + e);
+                            Map<String, Object> dataFromDatabase = new HashMap<>();
+                            dataFromDatabase.putAll(
+                                    (Map<? extends String, ?>) httpsCallableResult.getData());
 
-        }).addOnSuccessListener(httpsCallableResult -> {
+                            reportId = dataFromDatabase.get("reportId").toString();
 
-            Log.v("REPORT_CREATE", "Creating Report Document Successful");
-            Log.v("REPORT_CREATE", "Return From Database - " + httpsCallableResult.getData().toString());
-
-            Map<String, Object> dataFromDatabase = new HashMap<>();
-            dataFromDatabase.putAll((Map<? extends String, ?>) httpsCallableResult.getData());
-
-            reportId = dataFromDatabase.get("reportId").toString();
-
-            // Code for passing report document reference
-            // Intent intent = new Intent(FirebaseFunctionExample.this, ReportDetailPage.class);
-            // intent.putExtra("issueReference", (String) dataFromDatabase.get("reportId"));
-            // startActivity(intent);
-            // finish();
-        });
+                            // Code for passing report document reference
+                            // Intent intent = new Intent(FirebaseFunctionExample.this,
+                            // ReportDetailPage.class);
+                            // intent.putExtra("issueReference", (String)
+                            // dataFromDatabase.get("reportId"));
+                            // startActivity(intent);
+                            // finish();
+                        });
     }
 
     private void getReport() {
@@ -106,18 +110,25 @@ public class FirebaseFunctionExample extends AppCompatActivity {
 
         Log.v("REPORT_GET", "Getting report from database...");
 
-        mFunctions.getHttpsCallable("getReportDocument").call(jsonData).addOnFailureListener(e -> {
+        mFunctions
+                .getHttpsCallable("getReportDocument")
+                .call(jsonData)
+                .addOnFailureListener(
+                        e -> {
+                            Log.v("REPORT_GET", "Getting Report Document Failed");
+                            Log.v("REPORT_GET", "Exception - " + e);
+                        })
+                .addOnSuccessListener(
+                        httpsCallableResult -> {
+                            Log.v("REPORT_GET", "Getting Report Document Successful");
+                            Log.v(
+                                    "REPORT_GET",
+                                    "Return From Database - "
+                                            + httpsCallableResult.getData().toString());
 
-            Log.v("REPORT_GET", "Getting Report Document Failed");
-            Log.v("REPORT_GET", "Exception - " + e);
-
-        }).addOnSuccessListener(httpsCallableResult -> {
-
-            Log.v("REPORT_GET", "Getting Report Document Successful");
-            Log.v("REPORT_GET", "Return From Database - " + httpsCallableResult.getData().toString());
-
-            Map<String, Object> dataFromDatabase = new HashMap<>();
-            dataFromDatabase.putAll((Map<? extends String, ?>) httpsCallableResult.getData());
-        });
+                            Map<String, Object> dataFromDatabase = new HashMap<>();
+                            dataFromDatabase.putAll(
+                                    (Map<? extends String, ?>) httpsCallableResult.getData());
+                        });
     }
 }
