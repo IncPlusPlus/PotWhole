@@ -15,7 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 
-/** * A simple {@link Fragment} subclass. Use the factory method to create an instance of this
+/**
+ * * A simple {@link Fragment} subclass. Use the factory method to create an instance of this
  * fragment.
  */
 public class MyAccountFragment extends Fragment {
