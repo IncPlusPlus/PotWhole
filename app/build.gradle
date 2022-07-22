@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'com.diffplug.spotless' version '6.8.0'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
 }
 
 android {
@@ -12,7 +14,13 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
-
+        Properties properties = new Properties()
+        if (rootProject.file('local.properties').canRead()) {
+            properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        }
+        var resolvedMapKey = properties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY")
+        println "Maps API key present and valid: " + (resolvedMapKey instanceof String && !resolvedMapKey.isAllWhitespace())
+        manifestPlaceholders = [MAPS_API_KEY: resolvedMapKey]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -36,10 +44,11 @@ spotless {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'com.google.android.libraries.places:places:2.6.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
