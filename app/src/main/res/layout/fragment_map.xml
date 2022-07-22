@@ -5,4 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MapFragment">
+
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/new_report_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="340dp"
+        android:layout_marginBottom="85dp"
+        android:contentDescription="@string/newReportButtonDescription" />
 </FrameLayout>

@@ -4,4 +4,5 @@
     <string name="reports">Reports</string>
     <string name="my_reports">My Reports</string>
     <string name="account">Account</string>
+    <string name="newReportButtonDescription">create new report at current location</string>
 </resources>
