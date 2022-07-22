@@ -17,8 +17,13 @@ jobs:
           distribution: 'liberica'
           java-version: 17
 
-      - name: Build Lint
+      - name: Touch local properties
+        run: touch local.properties
+
+      - name: Check formatting
         run: ./gradlew :app:spotlessCheck
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
   lint:
     runs-on: ubuntu-latest
@@ -32,8 +37,13 @@ jobs:
           distribution: 'liberica'
           java-version: 17
 
-      - name: Build Lint
+      - name: Touch local properties
+        run: touch local.properties
+
+      - name: Run linter
         run: ./gradlew lintDebug
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       - name: Upload Build Lint Report
         uses: actions/upload-artifact@v2
@@ -47,6 +57,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Touch local properties
+        run: touch local.properties
 
       - name: Run Unit Tests
         run: ./gradlew test
