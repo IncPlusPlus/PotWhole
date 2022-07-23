@@ -48,7 +48,7 @@ public class FirebaseFunctionExample extends AppCompatActivity {
 
         FirebaseUser currUser = mAuth.getCurrentUser();
 
-        Log.v("This", mAuth.getCurrentUser().getUid());
+        Log.v("This", currUser.getUid());
 
         // Latitude and Longitude are Numbers, not strings
         Map<String, Object> locationDevice = new HashMap<>();
@@ -85,7 +85,7 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                             dataFromDatabase.putAll(
                                     (Map<? extends String, ?>) httpsCallableResult.getData());
 
-                            reportId = dataFromDatabase.get("reportId").toString();
+                            reportId = dataFromDatabase.get("rid").toString();
 
                             // Code for passing report document reference
                             // Intent intent = new Intent(FirebaseFunctionExample.this,
@@ -103,7 +103,7 @@ public class FirebaseFunctionExample extends AppCompatActivity {
         mFunctions = FirebaseFunctions.getInstance();
 
         Map<String, Object> data = new HashMap<>();
-        data.put("reportId", reportId);
+        data.put("rid", reportId);
 
         Gson gson = new Gson();
         final String jsonData = gson.toJson(data);

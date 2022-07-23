@@ -1,12 +1,15 @@
 package io.github.incplusplus.potwhole;
 
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
@@ -66,9 +69,16 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            currentUser.reload();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null) {
+            try{
+                mAuth.getCurrentUser().reload();
+                Log.v("USER_RELOAD", "Reload currently signed in user");
+            }catch (Exception ERROR_USER_NOT_FOUND) {
+                mAuth.signOut();
+                Log.v("USER_ERROR", "User does not exist in Firestore");
+            }
         }
     }
 }
