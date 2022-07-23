@@ -68,9 +68,9 @@ public class RegisterAccountPage extends AppCompatActivity {
 
                             // If sign in fails, display a message to the user.
                             Log.w("AUTH_INFO", "createUserWithEmail:failure", e);
-                            // Toast.makeText(CreateAccountPage.this, "Error: Authentication
-                            // failed. Please Check your email or password"
-                            // Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CreateAccountPage.this, "Error: Authentication
+                            failed. Please Check your email or password"
+                            Toast.LENGTH_SHORT).show();
                         });
     }
 }
