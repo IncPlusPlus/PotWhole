@@ -6,6 +6,7 @@ import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,9 +69,12 @@ public class RegisterAccountPage extends AppCompatActivity {
 
                             // If sign in fails, display a message to the user.
                             Log.w("AUTH_INFO", "createUserWithEmail:failure", e);
-                            // Toast.makeText(CreateAccountPage.this, "Error: Authentication
-                            // failed. Please Check your email or password"
-                            // Toast.LENGTH_SHORT).show();
+                            Toast toast =
+                                    Toast.makeText(
+                                            RegisterAccountPage.this,
+                                            "Error: Authentication failed. Please Check your email or password",
+                                            Toast.LENGTH_SHORT);
+                            toast.show();
                         });
     }
 }

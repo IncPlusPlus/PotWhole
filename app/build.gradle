@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'com.diffplug.spotless' version '6.8.0'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
 }
 
 android {
@@ -12,7 +14,13 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
-
+        Properties properties = new Properties()
+        if (rootProject.file('local.properties').canRead()) {
+            properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        }
+        var resolvedMapKey = properties.getProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY")
+        println "Maps API key present and valid: " + (resolvedMapKey instanceof String && !resolvedMapKey.isAllWhitespace())
+        manifestPlaceholders = [MAPS_API_KEY: resolvedMapKey]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -42,10 +50,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
     implementation 'com.google.firebase:firebase-auth:21.0.6'
     implementation 'androidx.annotation:annotation:1.4.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
@@ -53,6 +61,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.google.firebase:firebase-firestore:24.2.1'
     implementation 'com.google.firebase:firebase-functions:20.1.0'
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'com.google.android.libraries.places:places:2.6.0'
+
     testImplementation 'junit:junit:4.13.2'
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
