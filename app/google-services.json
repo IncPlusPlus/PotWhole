@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "947541306783",
+    "project_id": "potwhole-235c3",
+    "storage_bucket": "potwhole-235c3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947541306783:android:c36c91c83dd6794c9721aa",
+        "android_client_info": {
+          "package_name": "io.github.incplusplus.potwhole"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "947541306783-a48jm6qq6bb7scgcunmjkrb69uuh1a79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXdhfblciwoW2j_QsqpzuJBJ-RR13Fky0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "947541306783-a48jm6qq6bb7scgcunmjkrb69uuh1a79.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
