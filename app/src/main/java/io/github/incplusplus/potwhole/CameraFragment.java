@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 public class CameraFragment extends AppCompatActivity {
+    //permission related, can leave as is
     private static final String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
     private static final String[] STORAGE_PERMISSION = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private static final int CAMERA_REQUEST_CODE = 10;
@@ -22,6 +23,7 @@ public class CameraFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //this can be moved to where the camera button is
         Button enableCamera = findViewById(R.id.enableCamera);
         enableCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -37,6 +39,7 @@ public class CameraFragment extends AppCompatActivity {
 
     }
 
+    //check camera perms
     private boolean hasCameraPermission() {
         return ContextCompat.checkSelfPermission(
                 this,
@@ -44,6 +47,7 @@ public class CameraFragment extends AppCompatActivity {
         ) == PackageManager.PERMISSION_GRANTED;
     }
 
+    //check storage perms
     private boolean hasStoragePermission() {
         return ContextCompat.checkSelfPermission(
                 this,
@@ -51,6 +55,7 @@ public class CameraFragment extends AppCompatActivity {
         ) == PackageManager.PERMISSION_GRANTED;
     }
 
+    //request permission
     private void requestPermission() {
         ActivityCompat.requestPermissions(
                 this,
@@ -60,6 +65,7 @@ public class CameraFragment extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, STORAGE_PERMISSION, STORAGE_REQUEST_CODE);
     }
 
+    //start camera activity in CameraActivity
     private void enableCamera() {
         Intent intent = new Intent(this, CameraActivity.class);
         startActivity(intent);
