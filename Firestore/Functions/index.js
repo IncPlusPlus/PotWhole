@@ -19,6 +19,59 @@ exports.createAuthenticatedUserDocument = functions.auth.user().onCreate(async (
     };
 });
 
+exports.updateUserDocument = functions.https.onCall(async (data, context) => {
+
+    const uid = context.auth.uid
+
+    if (uid != undefined) {
+        const dataField = JSON.parse(data);
+
+        await database.collection('users').doc(uid.toString()).set({
+            username: dataField.username,
+            //profilePicture: dataField.profilePicture,
+        });
+
+        return {
+            returnStatus: 'Users information has been updated.'
+        };
+        
+    } else {
+        returnStatus: 'Functions failed to execute: User is not authenticated'
+    }
+});
+
+exports.getUserDocument = functions.https.onCall(async (data, context) => {
+
+    // Grab user identifier to reference user
+    const uid = context.auth.uid
+
+    // perform function on the condition that uid is not undefined
+    if (uid != undefined) {
+        //Parse data sent to database from application instance
+        const dataField = JSON.parse(data);
+
+        // Retrive the document with the uid identifier
+        const documentGrab = await database.collection('users').doc(dataField.uid).get();
+
+        // Build the return data, including relevant information
+        userData = {
+            username: documentGrab.data().username,
+        };
+
+        // return the status of the function and relevant report data
+        return {
+            returnStatus: 'Existing report information from uid document has been returned to requesting user',
+            report: userData
+        };
+
+    } else {
+        // return the status of the function that did not execute
+        return {
+            returnStatus: 'Functions failed to execute: User is not authenticated'
+        }
+    }
+});
+
 // Create a Report in Firestore with provided data (Require all fields)
 exports.createReportDocument = functions.https.onCall(async (data, context) => {
 
@@ -34,10 +87,12 @@ exports.createReportDocument = functions.https.onCall(async (data, context) => {
         const reportDocument = await database.collection('reports').add({
             title: dataField.title,
             description: dataField.description,
+            image: dataField.image,
             location: {
                 latitude: parseFloat(dataField.location.latitude),
                 longitude: parseFloat(dataField.location.longitude)
             },
+            originalReporterUid: uid,
             timestamp: new Date(Date.now())
         });
 
@@ -81,6 +136,7 @@ exports.getReportDocument = functions.https.onCall(async (data, context) => {
             title: documentGrab.data().title,
             description: documentGrab.data().description,
             originalReporterUid: documentGrab.data().originalReporterUid,
+            image: documentGrab.data().image,
             location: documentGrab.data().location,
             timestamp: documentGrab.data().timestamp
         };
@@ -96,4 +152,13 @@ exports.getReportDocument = functions.https.onCall(async (data, context) => {
             returnStatus: 'Functions failed to execute: User is not authenticated'
         }
     }
+});
+
+exports.getAllReportDocuments = functions.https.onCall(async (data, context) => {
+    const snapshot = await database.collection('reports').get();
+
+    return {
+        returnStatus: 'Returning all relevant rids',
+        reports: snapshot.docs.map(doc => doc.data()),
+    };
 });

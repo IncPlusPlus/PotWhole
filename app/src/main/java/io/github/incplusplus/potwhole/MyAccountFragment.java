@@ -68,6 +68,8 @@ public class MyAccountFragment extends Fragment {
         } else {
             Button signOutButton = requireView().findViewById(R.id.sign_out_button);
 
+            Button updateAccountButton = requireView().findViewById(R.id.update_account_button);
+
             Button functionButton = requireView().findViewById(R.id.functions);
 
             signOutButton.setOnClickListener(
@@ -75,6 +77,12 @@ public class MyAccountFragment extends Fragment {
                         mAuth.signOut();
 
                         Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                    });
+
+            updateAccountButton.setOnClickListener(
+                    v -> {
+                        Intent intent = new Intent(getActivity(), UpdateAccount.class);
                         startActivity(intent);
                     });
 
