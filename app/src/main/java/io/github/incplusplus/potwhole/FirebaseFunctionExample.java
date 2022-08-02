@@ -54,6 +54,8 @@ public class FirebaseFunctionExample extends AppCompatActivity {
 
         Button getPosts = findViewById(R.id.getPosts);
 
+        Button getUserPosts = findViewById(R.id.getUserPosts);
+
         uploadImage.setOnClickListener(
                 v -> {
                     try {
@@ -76,6 +78,11 @@ public class FirebaseFunctionExample extends AppCompatActivity {
         getPosts.setOnClickListener(
                 v -> {
                     getAllReports();
+                });
+
+        getUserPosts.setOnClickListener(
+                v -> {
+                    getAllUserReports();
                 });
     }
 
@@ -265,6 +272,34 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                 .addOnSuccessListener(
                         httpsCallableResult -> {
                             Log.v("REPORT_GET", "Getting Report Document Successful");
+                            Log.v(
+                                    "REPORT_GET",
+                                    "Return From Database - " + httpsCallableResult.getData());
+
+                            Map<String, Object> dataFromDatabase = new HashMap<>();
+                            dataFromDatabase.putAll(
+                                    (Map<? extends String, ?>) httpsCallableResult.getData());
+                        });
+    }
+
+    private void getAllUserReports() {
+
+        mAuth = FirebaseAuth.getInstance();
+        mFunctions = FirebaseFunctions.getInstance();
+
+        Log.v("REPORT_GET", "Getting all user reports from database...");
+
+        mFunctions
+                .getHttpsCallable("getUserReports")
+                .call()
+                .addOnFailureListener(
+                        e -> {
+                            Log.v("REPORT_GET", "Getting user Report Document Failed");
+                            Log.v("REPORT_GET", "Exception - " + e);
+                        })
+                .addOnSuccessListener(
+                        httpsCallableResult -> {
+                            Log.v("REPORT_GET", "Getting user Report Document Successful");
                             Log.v(
                                     "REPORT_GET",
                                     "Return From Database - " + httpsCallableResult.getData());

@@ -62,7 +62,22 @@
         app:layout_constraintHorizontal_bias="0.432"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.799"
+        app:layout_constraintVertical_bias="0.783"
+        tools:ignore="TextContrastCheck" />
+
+    <Button
+        android:id="@+id/getUserPosts"
+        android:layout_width="374dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/black"
+        android:text="get user posts"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.9"
         tools:ignore="TextContrastCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
