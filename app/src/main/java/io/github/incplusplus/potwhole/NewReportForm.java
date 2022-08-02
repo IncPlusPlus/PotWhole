@@ -6,11 +6,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.textfield.TextInputEditText;
-
 import java.io.File;
 
 public class NewReportForm extends AppCompatActivity {
@@ -40,10 +36,9 @@ public class NewReportForm extends AppCompatActivity {
         EditText description = findViewById(R.id.description_box);
 
         Button submitButton = findViewById(R.id.submit_report_button);
-        submitButton.setOnClickListener(v -> submitReport(imageFile, description.getText().toString()));
+        submitButton.setOnClickListener(
+                v -> submitReport(imageFile, description.getText().toString()));
     }
 
-    private void submitReport(File imageFile, String description) {
-
-    }
+    private void submitReport(File imageFile, String description) {}
 }
