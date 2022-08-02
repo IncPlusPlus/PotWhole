@@ -2,6 +2,7 @@ package io.github.incplusplus.potwhole;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -25,10 +26,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-/**
- * A simple {@link Fragment} subclass. Use the {@link MapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "Map";
@@ -192,12 +189,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment supportMapFragment = createSupportMapFragment();
         supportMapFragment.getMapAsync(this);
 
-        FloatingActionButton button = container.findViewById(R.id.new_report_button);
+        FloatingActionButton button = view.findViewById(R.id.new_report_button);
         button.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO add camera functionality
+                        Intent intent = new Intent(context, CameraActivity.class);
+                        startActivity(intent);
                     }
                 });
 
