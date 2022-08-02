@@ -72,6 +72,25 @@ exports.getUserDocument = functions.https.onCall(async (data, context) => {
     }
 });
 
+exports.getUserReports = functions.https.onCall(async (data, context) => {
+    const uid = context.auth.uid
+
+    if (uid != undefined) {
+        const snapshot = await database.collection('users').doc(uid.toString()).collection('userCreatedReports').get();
+
+        return {
+            returnStatus: "Data is returned",
+            data: snapshot.docs.map(doc => doc.data().ref._path.segments[1]),
+        }
+
+    } else {
+            // return the status of the function that did not execute
+            return {
+                returnStatus: 'Functions failed to execute: User is not authenticated'
+            }
+    }
+});
+
 // Create a Report in Firestore with provided data (Require all fields)
 exports.createReportDocument = functions.https.onCall(async (data, context) => {
 
