@@ -101,23 +101,25 @@ public class NewReportForm extends AppCompatActivity {
                 .addOnSuccessListener(
                         taskSnapshot -> {
                             Log.v(TAG, "Upload task completed successfully");
-                            // taskSnapshot.getMetadata() contains file metadata such as size,
-                            // content-type, etc.
-                            // ...
-                        });
-
-        imagesUploadRef
-                .getDownloadUrl()
-                .addOnFailureListener(
-                        exception -> {
-                            Log.e(TAG, "Failed to get uploaded image URL.", exception);
-                        })
-                .addOnSuccessListener(
-                        uri -> {
-                            String downloadURL = uri.toString();
-                            Log.v("MY_URL", downloadURL);
-                            createReport(lastKnownLocation, downloadURL, title, description);
-                            // sendToBitmap();
+                            imagesUploadRef
+                                    .getDownloadUrl()
+                                    .addOnFailureListener(
+                                            exception -> {
+                                                Log.e(
+                                                        TAG,
+                                                        "Failed to get uploaded image URL.",
+                                                        exception);
+                                            })
+                                    .addOnSuccessListener(
+                                            uri -> {
+                                                String downloadURL = uri.toString();
+                                                Log.v("MY_URL", downloadURL);
+                                                createReport(
+                                                        lastKnownLocation,
+                                                        downloadURL,
+                                                        title,
+                                                        description);
+                                            });
                         });
     }
 
