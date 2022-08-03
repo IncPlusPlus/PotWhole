@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
@@ -169,6 +170,11 @@ public class CameraActivity extends AppCompatActivity {
                                             new Intent(
                                                     CameraActivity.this, ImageConfirmation.class);
                                     intent.putExtra("photoUri", outputFileResults.getSavedUri());
+                                    // Keep passing the last known location through the workflow
+                                    intent.putExtra(
+                                            "location",
+                                            (Parcelable)
+                                                    getIntent().getParcelableExtra("location"));
                                     startActivity(intent);
                                 }
 
