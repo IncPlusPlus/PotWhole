@@ -1,14 +1,17 @@
 package io.github.incplusplus.potwhole;
 
+import static io.github.incplusplus.potwhole.MainActivity.TAG;
+import static io.github.incplusplus.potwhole.util.ImageFunctions.loadImage;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 
@@ -23,62 +26,34 @@ public class ImageConfirmation extends AppCompatActivity {
 
         Uri photoUri = getIntent().getParcelableExtra("photoUri");
 
-        Intent intent = getIntent();
-
-        ExifInterface ei = null;
+        Bitmap bitmap = null;
         try {
-            ei = new ExifInterface(photoUri.getPath());
+            bitmap = loadImage(photoUri.getPath());
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-        int orientation =
-                ei.getAttributeInt(
-                        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-
-        Bitmap bitmap = BitmapFactory.decodeFile(photoUri.getPath());
-        Bitmap rotatedBitmap = null;
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                rotatedBitmap = rotateImage(bitmap, 90);
-                break;
-
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                rotatedBitmap = rotateImage(bitmap, 180);
-                break;
-
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                rotatedBitmap = rotateImage(bitmap, 270);
-                break;
-
-            case ExifInterface.ORIENTATION_NORMAL:
-            default:
-                rotatedBitmap = bitmap;
+            Log.e(TAG, "Failed to load saved image", e);
+            Toast.makeText(this, "Failed to load saved image.", Toast.LENGTH_SHORT).show();
         }
 
         Button yes = findViewById(R.id.useImage);
         Button no = findViewById(R.id.retakeImage);
 
         ImageView displayImage = findViewById(R.id.imagePreview);
-        displayImage.setImageBitmap(rotatedBitmap);
+        displayImage.setImageBitmap(bitmap);
 
         yes.setOnClickListener(
                 v -> {
-                    /*Intent intent1 = new Intent(ImageConfirmation.this, CameraActivity.class);
-                    startActivity(intent1); */
-                    // something magical happens
+                    Intent confirmedIntent =
+                            new Intent(ImageConfirmation.this, NewReportForm.class);
+                    confirmedIntent.putExtra("photoUri", photoUri);
+                    // Finally pass the last known location to the new report form
+                    confirmedIntent.putExtra(
+                            "location", (Parcelable) getIntent().getParcelableExtra("location"));
+                    startActivity(confirmedIntent);
                 });
         no.setOnClickListener(
                 v -> {
-                    Intent intent2 = new Intent(ImageConfirmation.this, CameraActivity.class);
-                    startActivity(intent2);
+                    Intent retakeIntent = new Intent(ImageConfirmation.this, CameraActivity.class);
+                    startActivity(retakeIntent);
                 });
-    }
-
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        // Could result in OOM error for large bitmaps as two will exist in memory at once
-        return Bitmap.createBitmap(
-                source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 }

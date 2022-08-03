@@ -195,6 +195,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(context, CameraActivity.class);
+                        // Pass the last known location down through the image capture workflow
+                        intent.putExtra("location", lastKnownLocation);
                         startActivity(intent);
                     }
                 });
