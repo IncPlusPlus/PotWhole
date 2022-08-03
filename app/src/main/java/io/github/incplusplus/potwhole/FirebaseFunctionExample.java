@@ -18,6 +18,8 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +40,8 @@ public class FirebaseFunctionExample extends AppCompatActivity {
 
     private String downloadURL;
     private String reportId = "";
+
+    private Map<String, Object> dataFromDatabase = new HashMap<>();
 
     private double INSERT_REPORT_LATITUDE, INSERT_REPORT_LONGITUDE;
 
@@ -159,8 +163,6 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                         });
     }
 
-    private void sendToBitmap() {}
-
     private void createReport() {
 
         mAuth = FirebaseAuth.getInstance();
@@ -180,6 +182,7 @@ public class FirebaseFunctionExample extends AppCompatActivity {
         data.put("image", downloadURL);
         data.put("description", "INSERT_REPORT_DESCRIPTION");
         data.put("location", locationDevice);
+        data.put("timestamp", ZonedDateTime.now().toString());
 
         Gson gson = new Gson();
         final String jsonData = gson.toJson(data);
@@ -247,10 +250,6 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                                     "REPORT_GET",
                                     "Return From Database - "
                                             + httpsCallableResult.getData().toString());
-
-                            Map<String, Object> dataFromDatabase = new HashMap<>();
-                            dataFromDatabase.putAll(
-                                    (Map<? extends String, ?>) httpsCallableResult.getData());
                         });
     }
 
@@ -275,10 +274,10 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                             Log.v(
                                     "REPORT_GET",
                                     "Return From Database - " + httpsCallableResult.getData());
+                            ArrayList a = new ArrayList();
+                            a = (ArrayList) httpsCallableResult.getData();
 
-                            Map<String, Object> dataFromDatabase = new HashMap<>();
-                            dataFromDatabase.putAll(
-                                    (Map<? extends String, ?>) httpsCallableResult.getData());
+                            System.out.println(a);
                         });
     }
 
@@ -303,10 +302,6 @@ public class FirebaseFunctionExample extends AppCompatActivity {
                             Log.v(
                                     "REPORT_GET",
                                     "Return From Database - " + httpsCallableResult.getData());
-
-                            Map<String, Object> dataFromDatabase = new HashMap<>();
-                            dataFromDatabase.putAll(
-                                    (Map<? extends String, ?>) httpsCallableResult.getData());
                         });
     }
 }

@@ -26,7 +26,10 @@ exports.updateUserDocument = functions.https.onCall(async (data, context) => {
     if (uid != undefined) {
         const dataField = JSON.parse(data);
 
+        const documentGrab = await database.collection('users').doc(uid).get();
+
         await database.collection('users').doc(uid.toString()).set({
+            email: documentGrab.data().email,
             username: dataField.username,
             //profilePicture: dataField.profilePicture,
         });
@@ -34,7 +37,7 @@ exports.updateUserDocument = functions.https.onCall(async (data, context) => {
         return {
             returnStatus: 'Users information has been updated.'
         };
-        
+
     } else {
         returnStatus: 'Functions failed to execute: User is not authenticated'
     }
@@ -78,16 +81,32 @@ exports.getUserReports = functions.https.onCall(async (data, context) => {
     if (uid != undefined) {
         const snapshot = await database.collection('users').doc(uid.toString()).collection('userCreatedReports').get();
 
-        return {
-            returnStatus: "Data is returned",
-            data: snapshot.docs.map(doc => doc.data().ref._path.segments[1]),
+        const documents = snapshot.docs.map(doc => doc.data().ref._path.segments[1]);
+
+        const array = [];
+
+        for (const document of documents) {
+
+            const documentGrab = await database.collection('reports').doc(document.toString()).get();
+
+            array.push({
+                title: documentGrab.data().title,
+                description: documentGrab.data().description,
+                originalReporterUid: documentGrab.data().originalReporterUid,
+                originalReporterUsername: documentGrab.data().originalReporterUsername,
+                image: documentGrab.data().image,
+                location: documentGrab.data().location,
+                timestamp: documentGrab.data().timestamp
+            });
         }
 
+        return array;
+
     } else {
-            // return the status of the function that did not execute
-            return {
-                returnStatus: 'Functions failed to execute: User is not authenticated'
-            }
+        // return the status of the function that did not execute
+        return {
+            returnStatus: 'Functions failed to execute: User is not authenticated'
+        }
     }
 });
 
@@ -102,6 +121,13 @@ exports.createReportDocument = functions.https.onCall(async (data, context) => {
         // Parse data sent to database from authenticated instance
         const dataField = JSON.parse(data);
 
+        console.log(dataField);
+
+        console.log(uid);
+        const documentGrab = await database.collection('users').doc(uid.toString()).get();
+
+        console.log(documentGrab.data());
+
         // Create and Populate a reoprt document with recieved data
         const reportDocument = await database.collection('reports').add({
             title: dataField.title,
@@ -112,7 +138,8 @@ exports.createReportDocument = functions.https.onCall(async (data, context) => {
                 longitude: parseFloat(dataField.location.longitude)
             },
             originalReporterUid: uid,
-            timestamp: new Date(Date.now())
+            originalReporterUsername: documentGrab.data().username,
+            timestamp: dataField.timestamp,
         });
 
         // Define the path to the original report document from a users sub collection
@@ -155,6 +182,7 @@ exports.getReportDocument = functions.https.onCall(async (data, context) => {
             title: documentGrab.data().title,
             description: documentGrab.data().description,
             originalReporterUid: documentGrab.data().originalReporterUid,
+            originalReporterUsername: documentGrab.data().username,
             image: documentGrab.data().image,
             location: documentGrab.data().location,
             timestamp: documentGrab.data().timestamp
@@ -176,8 +204,5 @@ exports.getReportDocument = functions.https.onCall(async (data, context) => {
 exports.getAllReportDocuments = functions.https.onCall(async (data, context) => {
     const snapshot = await database.collection('reports').get();
 
-    return {
-        returnStatus: 'Returning all relevant rids',
-        reports: snapshot.docs.map(doc => doc.data()),
-    };
+    return snapshot.docs.map(doc => doc.data());
 });
