@@ -22,6 +22,7 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,6 +147,7 @@ public class NewReportForm extends AppCompatActivity {
         data.put("image", imageUrl);
         data.put("description", description);
         data.put("location", locationDevice);
+        data.put("timestamp", ZonedDateTime.now().toString());
 
         Gson gson = new Gson();
         final String jsonData = gson.toJson(data);
@@ -167,23 +169,6 @@ public class NewReportForm extends AppCompatActivity {
                                     "REPORT_CREATE",
                                     "Return From Database - "
                                             + httpsCallableResult.getData().toString());
-
-                            //                            Map<String, Object> dataFromDatabase = new
-                            // HashMap<>();
-                            //                            dataFromDatabase.putAll(
-                            //                                    (Map<? extends String, ?>)
-                            // httpsCallableResult.getData());
-                            //
-                            //                            reportId =
-                            // dataFromDatabase.get("rid").toString();
-
-                            // Code for passing report document reference
-                            // Intent intent = new Intent(FirebaseFunctionExample.this,
-                            // ReportDetailPage.class);
-                            // intent.putExtra("issueReference", (String)
-                            // dataFromDatabase.get("reportId"));
-                            // startActivity(intent);
-                            // finish();
                         });
     }
 }
