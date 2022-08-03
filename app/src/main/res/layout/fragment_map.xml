@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MapFragment">
 
-
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/new_report_button"
         android:layout_width="50dp"

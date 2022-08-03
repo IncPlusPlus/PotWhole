@@ -60,6 +60,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'com.google.android.libraries.places:places:2.6.0'
+    implementation 'com.google.firebase:firebase-functions:20.1.0'
+    implementation 'com.google.firebase:firebase-storage:20.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

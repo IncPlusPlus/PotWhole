@@ -1,10 +1,8 @@
 package io.github.incplusplus.potwhole;
 
-import java.time.ZonedDateTime;
-
 public class ReportItem {
     private String id;
-    private ZonedDateTime timeSubmitted;
+    private String timeSubmitted;
     private String submitterId;
     private String description;
     // This will probably be the LatLng type once #6 is merged and the library becomes available
@@ -15,7 +13,7 @@ public class ReportItem {
 
     public ReportItem(
             String id,
-            ZonedDateTime timeSubmitted,
+            String timeSubmitted,
             String submitterId,
             String description,
             String coordinates,
@@ -36,11 +34,11 @@ public class ReportItem {
         this.id = id;
     }
 
-    public ZonedDateTime getTimeSubmitted() {
+    public String getTimeSubmitted() {
         return timeSubmitted;
     }
 
-    public void setTimeSubmitted(ZonedDateTime timeSubmitted) {
+    public void setTimeSubmitted(String timeSubmitted) {
         this.timeSubmitted = timeSubmitted;
     }
 
