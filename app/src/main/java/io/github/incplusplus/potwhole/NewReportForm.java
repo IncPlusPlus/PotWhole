@@ -3,6 +3,7 @@ package io.github.incplusplus.potwhole;
 import static io.github.incplusplus.potwhole.MainActivity.TAG;
 import static io.github.incplusplus.potwhole.util.ImageFunctions.loadImage;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
@@ -97,7 +98,8 @@ public class NewReportForm extends AppCompatActivity {
                 .addOnFailureListener(
                         exception -> {
                             Log.e(TAG, "Failed to upload image.", exception);
-                            // Handle unsuccessful uploads
+                            Toast.makeText(this, "Failed to upload image.", Toast.LENGTH_SHORT)
+                                    .show();
                         })
                 .addOnSuccessListener(
                         taskSnapshot -> {
@@ -110,11 +112,16 @@ public class NewReportForm extends AppCompatActivity {
                                                         TAG,
                                                         "Failed to get uploaded image URL.",
                                                         exception);
+                                                Toast.makeText(
+                                                                this,
+                                                                "Failed to grab the URL of the uploaded image.",
+                                                                Toast.LENGTH_SHORT)
+                                                        .show();
                                             })
                                     .addOnSuccessListener(
                                             uri -> {
                                                 String downloadURL = uri.toString();
-                                                Log.v("MY_URL", downloadURL);
+                                                Log.v(TAG, "Image download URL: " + downloadURL);
                                                 createReport(
                                                         lastKnownLocation,
                                                         downloadURL,
@@ -135,7 +142,7 @@ public class NewReportForm extends AppCompatActivity {
 
         FirebaseUser currUser = mAuth.getCurrentUser();
 
-        Log.v("This", currUser.getUid());
+        Log.v(TAG, "Current user ID: " + currUser.getUid());
 
         // Latitude and Longitude are Numbers, not strings
         Map<String, Object> locationDevice = new HashMap<>();
@@ -152,23 +159,31 @@ public class NewReportForm extends AppCompatActivity {
         Gson gson = new Gson();
         final String jsonData = gson.toJson(data);
 
-        Log.v("REPORT_CREATE", "Creating report in database...");
+        Log.v(TAG, "REPORT_CREATE: Creating report in database...");
 
         mFunctions
                 .getHttpsCallable("createReportDocument")
                 .call(jsonData)
                 .addOnFailureListener(
                         e -> {
-                            Log.v("REPORT_CREATE", "Creating Report Document Failed");
-                            Log.v("REPORT_CREATE", "Exception - " + e);
+                            Log.e(TAG, "REPORT_CREATE: Creating Report Document Failed", e);
                         })
                 .addOnSuccessListener(
                         httpsCallableResult -> {
-                            Log.v("REPORT_CREATE", "Creating Report Document Successful");
+                            Log.v(TAG, "REPORT_CREATE: Creating Report Document Successful");
                             Log.v(
-                                    "REPORT_CREATE",
-                                    "Return From Database - "
+                                    TAG,
+                                    "REPORT_CREATE: Return From Database - "
                                             + httpsCallableResult.getData().toString());
+                            // Let the user know everything went through okay
+                            Toast.makeText(
+                                            this,
+                                            "Report submitted successfully.",
+                                            Toast.LENGTH_LONG)
+                                    .show();
+                            // Kick the user back to the map screen
+                            Intent intent = new Intent(NewReportForm.this, MapFragment.class);
+                            startActivity(intent);
                         });
     }
 }
