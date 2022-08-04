@@ -2,6 +2,7 @@ package io.github.incplusplus.potwhole;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -192,7 +193,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         button.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {}
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, CameraActivity.class);
+                        // Pass the last known location down through the image capture workflow
+                        intent.putExtra("location", lastKnownLocation);
+                        startActivity(intent);
+                    }
                 });
 
         getChildFragmentManager()

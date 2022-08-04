@@ -123,8 +123,12 @@ exports.createReportDocument = functions.https.onCall(async (data, context) => {
         // Parse data sent to database from authenticated instance
         const dataField = JSON.parse(data);
 
+        console.log(dataField);
+
         console.log(uid);
-        const documentGrab = await database.collection('users').doc(uid).get();
+        const documentGrab = await database.collection('users').doc(uid.toString()).get();
+
+        console.log(documentGrab.data());
 
         // Create and Populate a reoprt document with recieved data
         const reportDocument = await database.collection('reports').add({

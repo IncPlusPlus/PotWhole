@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.functions.FirebaseFunctions;
 import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "PotWhole";
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set the container in activity_main to the map fragment on startup
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();
@@ -120,5 +122,22 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null) {
+            try {
+                mAuth.getCurrentUser().reload();
+                Log.v("USER_RELOAD", "Reload currently signed in user");
+            } catch (Exception ERROR_USER_NOT_FOUND) {
+                mAuth.signOut();
+                Log.v("USER_ERROR", "User does not exist in Firestore");
+            }
+        }
     }
 }
