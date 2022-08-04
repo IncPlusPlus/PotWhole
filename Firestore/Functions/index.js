@@ -37,9 +37,11 @@ exports.updateUserDocument = functions.https.onCall(async (data, context) => {
         return {
             returnStatus: 'Users information has been updated.'
         };
-
+        
     } else {
-        returnStatus: 'Functions failed to execute: User is not authenticated'
+        return {
+            returnStatus: 'Functions failed to execute: User is not authenticated'
+        }
     }
 });
 
@@ -103,10 +105,10 @@ exports.getUserReports = functions.https.onCall(async (data, context) => {
         return array;
 
     } else {
-        // return the status of the function that did not execute
-        return {
-            returnStatus: 'Functions failed to execute: User is not authenticated'
-        }
+            // return the status of the function that did not execute
+            return {
+                returnStatus: 'Functions failed to execute: User is not authenticated'
+            }
     }
 });
 

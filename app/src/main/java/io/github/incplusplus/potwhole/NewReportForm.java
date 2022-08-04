@@ -182,7 +182,7 @@ public class NewReportForm extends AppCompatActivity {
                                             Toast.LENGTH_LONG)
                                     .show();
                             // Kick the user back to the map screen
-                            Intent intent = new Intent(NewReportForm.this, MapFragment.class);
+                            Intent intent = new Intent(NewReportForm.this, MainActivity.class);
                             startActivity(intent);
                         });
     }
