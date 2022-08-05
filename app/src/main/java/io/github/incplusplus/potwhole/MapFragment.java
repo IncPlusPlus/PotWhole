@@ -1,11 +1,13 @@
 package io.github.incplusplus.potwhole;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,16 +17,26 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.functions.FirebaseFunctions;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -32,18 +44,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final int DEFAULT_ZOOM = 17;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
-    /*
-     *  Lat Long of Wentworth Hall
-     *   Degrees: 42°20'11"N 71°05'41"W
-     *   Decimal: 42.336389 lat  71.094722 long
-     */
-    private static final LatLng defaultLocation = new LatLng(42.336389, 71.094722);
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private boolean locationPermissionGranted;
     private Location lastKnownLocation;
+    private LatLng locationLatLng;
     private SupportMapFragment supportMapFragment;
     private Context context;
+    private LocationRequest locationRequest;
+    private ArrayList<Map<String, String>> convert = new ArrayList<>();
+    private ArrayList<Map<String, Map<String, Object>>> convertLoc = new ArrayList<>();
+    private List<ReportItem> reports = new ArrayList<ReportItem>();
 
     public MapFragment() {}
 
@@ -67,13 +78,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
          * onRequestPermissionsResult.
          */
         if (ContextCompat.checkSelfPermission(
-                        context.getApplicationContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
         } else {
             ActivityCompat.requestPermissions(
-                    getActivity(),
+                    requireActivity(),
                     new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
@@ -87,31 +97,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // location permission allowed
                 Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(
-                        getActivity(),
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                if (task.isSuccessful()) {
-                                    // Set the map's camera position to the current location of the
-                                    // device.
-                                    lastKnownLocation = task.getResult();
-                                    if (lastKnownLocation != null) {
-                                        map.moveCamera(
-                                                CameraUpdateFactory.newLatLngZoom(
-                                                        new LatLng(
-                                                                lastKnownLocation.getLatitude(),
-                                                                lastKnownLocation.getLongitude()),
-                                                        DEFAULT_ZOOM));
-                                    }
-                                } else {
-                                    // location permission not allowed
-                                    Log.d(TAG, "Current location is null");
-                                    Log.e(TAG, "Exception: %s", task.getException());
+                        requireActivity(),
+                        task -> {
+                            if (task.isSuccessful()) {
+                                // Set the map's camera position to the current location of the
+                                // device.
+                                lastKnownLocation = task.getResult();
+                                if (lastKnownLocation != null) {
+
+                                    locationLatLng =
+                                            new LatLng(
+                                                    lastKnownLocation.getLatitude(),
+                                                    lastKnownLocation.getLongitude());
                                     map.moveCamera(
                                             CameraUpdateFactory.newLatLngZoom(
-                                                    defaultLocation, DEFAULT_ZOOM));
-                                    map.getUiSettings().setMyLocationButtonEnabled(false);
+                                                    locationLatLng, DEFAULT_ZOOM));
                                 }
+                            } else {
+                                // location permission not allowed
+                                Log.d(TAG, "Current location is null");
+                                Log.e(TAG, "Exception: %s", task.getException());
+                                map.moveCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                                new LatLng(0, 0), DEFAULT_ZOOM));
+                                map.getUiSettings().setMyLocationButtonEnabled(false);
                             }
                         });
             }
@@ -119,16 +128,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
+
     /** Updates map to be set to current location and enable my location button. */
     private void updateLocationUI() {
         try {
             // check location permissions
-            if (ActivityCompat.checkSelfPermission(
-                                    context, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(
-                                    context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED) {
+            if (requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED
+                    && requireActivity()
+                                    .checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Location permission allowed", TAG);
                 // enable location
                 map.setMyLocationEnabled(true);
 
@@ -137,12 +147,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
             // if not allowed
             else {
+                Log.d("Location permission not allowed", TAG);
                 // disable location
                 map.setMyLocationEnabled(false);
                 // disable button
                 map.getUiSettings().setMyLocationButtonEnabled(false);
                 // cannot get location, so location is null
                 this.lastKnownLocation = null;
+                Log.d("lastKnowLocation is null", TAG);
 
                 // request permissions
                 getLocationPermission();
@@ -168,6 +180,75 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return mapOptions;
     }
 
+    private void createLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY);
+    }
+
+    private void addReportsMarkers() {
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+        Log.v("REPORT_GET", "Getting all reports from database...");
+
+        mFunctions
+                .getHttpsCallable("getAllReportDocuments")
+                .call()
+                .addOnFailureListener(
+                        e -> {
+                            Log.v("REPORT_GET", "Getting Report Document Failed");
+                            Log.v("REPORT_GET", "Exception - " + e);
+                        })
+                .addOnSuccessListener(
+                        httpsCallableResult -> {
+                            Log.v("REPORT_GET", "Getting Report Document Successful");
+                            Log.v(
+                                    "REPORT_GET",
+                                    "Return From Database - " + httpsCallableResult.getData());
+                            ArrayList arr;
+
+                            arr = (ArrayList) httpsCallableResult.getData();
+
+                            ArrayList<Map<String, String>> convert = arr;
+                            ArrayList<Map<String, Map<String, Object>>> convertLoc = arr;
+
+                            for (int i = 0; i < convert.size(); i++) {
+                                double latitude =
+                                        (double) convertLoc.get(i).get("location").get("latitude");
+                                double longitude =
+                                        (double) convertLoc.get(i).get("location").get("longitude");
+
+                                ReportItem item =
+                                        new ReportItem(
+                                                convert.get(i).get("title"),
+                                                convert.get(i).get("timestamp"),
+                                                convert.get(i).get("originalReporterUsername"),
+                                                convert.get(i).get("description"),
+                                                new LatLng(latitude, longitude),
+                                                convert.get(i).get("image"));
+                                Log.v("ITEM", item.toString());
+
+                                map.addMarker(
+                                        new MarkerOptions()
+                                                .position(item.getCoordinates())
+                                                .title(item.getId())
+                                                .icon(
+                                                        BitmapDescriptorFactory.defaultMarker(
+                                                                BitmapDescriptorFactory
+                                                                        .HUE_VIOLET)));
+                            }
+                        });
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates(
+            LocationCallback locationCallback, LocationRequest locationRequest) {
+        if (locationPermissionGranted) {
+            fusedLocationProviderClient.requestLocationUpdates(
+                    locationRequest, locationCallback, Looper.myLooper());
+        }
+    }
+
     /**
      * Loads when map is ready to be used
      *
@@ -178,6 +259,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.map = googleMap;
         updateLocationUI();
         getDeviceLocation();
+        addReportsMarkers();
+    }
+    /*
+    Called in the LocationCallback when a new location is returned
+     */
+    private void onNewLocation(@NonNull Location location) {
+        if (lastKnownLocation != null) {
+            // Only move the camera when the new location is more than 5 meters from the old one
+            if (location.distanceTo(lastKnownLocation) >= 5) {
+                lastKnownLocation = location;
+                locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+                // if callback is run before map is ready, map will be null
+                if (map != null) {
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, DEFAULT_ZOOM));
+                }
+            }
+        }
     }
 
     @Override
@@ -186,21 +285,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         this.context = getActivity();
-        SupportMapFragment supportMapFragment = createSupportMapFragment();
-        supportMapFragment.getMapAsync(this);
+        if (this.supportMapFragment == null) {
+            this.supportMapFragment = createSupportMapFragment();
+        }
+
+        this.supportMapFragment.getMapAsync(this);
+        Log.d(String.valueOf(locationLatLng), TAG);
+
+        // Callback for Updating Location
+        LocationCallback locationCallback =
+                new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        Log.i("Location callback called", TAG);
+                        onNewLocation(Objects.requireNonNull(locationResult.getLastLocation()));
+                    }
+                };
+
+        createLocationRequest();
+        startLocationUpdates(locationCallback, locationRequest);
 
         FloatingActionButton button = view.findViewById(R.id.new_report_button);
         button.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, CameraActivity.class);
-                        // Pass the last known location down through the image capture workflow
-                        intent.putExtra("location", lastKnownLocation);
-                        startActivity(intent);
-                    }
+                v -> {
+                    Intent intent = new Intent(context, CameraActivity.class);
+                    // Pass the last known location down through the image capture workflow
+                    intent.putExtra("location", lastKnownLocation);
+                    startActivity(intent);
                 });
-
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.map_fragment, supportMapFragment)
