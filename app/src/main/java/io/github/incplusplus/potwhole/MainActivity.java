@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "PotWhole";
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();
-            Fragment mapFragment = new MapFragment();
+            MapFragment mapFragment = new MapFragment();
+            this.mapFragment = mapFragment;
             transaction.replace(R.id.container, mapFragment);
             transaction.commit();
         }
