@@ -2,13 +2,6 @@ package io.github.incplusplus.potwhole;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -18,11 +11,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.gson.Gson;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,8 +38,8 @@ public class RegisterAccountFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_register_account, container, false);
     }
@@ -122,7 +118,7 @@ public class RegisterAccountFragment extends Fragment {
                         });
     }
 
-    private void updateUsername(){
+    private void updateUsername() {
         String username = editTextUsername.getText().toString().trim();
 
         mFunctions = FirebaseFunctions.getInstance();
@@ -152,8 +148,7 @@ public class RegisterAccountFragment extends Fragment {
                                     "Return From Database - "
                                             + httpsCallableResult.getData().toString());
 
-                            Intent intent =
-                                    new Intent(getActivity(), MainActivity.class);
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
                             startActivity(intent);
                         });
     }

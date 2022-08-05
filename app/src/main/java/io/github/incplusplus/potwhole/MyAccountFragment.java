@@ -12,15 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.functions.FirebaseFunctions;
-
-import java.util.ArrayList;
 import java.util.Map;
 
 public class MyAccountFragment extends Fragment {
@@ -103,7 +99,8 @@ public class MyAccountFragment extends Fragment {
                                         "USER_DOC_GET",
                                         "Return From Database - " + httpsCallableResult.getData());
 
-                                Map<String, Object> data = (Map<String, Object>) httpsCallableResult.getData();
+                                Map<String, Object> data =
+                                        (Map<String, Object>) httpsCallableResult.getData();
 
                                 Log.v("USERNAME", data.get("username").toString());
 
