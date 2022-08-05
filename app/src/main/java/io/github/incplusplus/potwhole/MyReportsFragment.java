@@ -51,6 +51,7 @@ public class MyReportsFragment extends Fragment {
         fusedLocationProviderClient =
                 LocationServices.getFusedLocationProviderClient(requireActivity());
         getLastLocation(requireActivity());
+
         convert = (ArrayList) getArguments().getStringArrayList("data");
         convertLoc = (ArrayList) getArguments().getStringArrayList("data");
 

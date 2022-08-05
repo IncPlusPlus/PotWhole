@@ -88,7 +88,7 @@ public class ReportItemAdapter extends ArrayAdapter<ReportItem> {
         }
 
         @Override
-        protected Bitmap doInBackground(String... url) {
+        public Bitmap doInBackground(String... url) {
             String stringUrl = url[0];
             bitmap = null;
             InputStream inputStream;

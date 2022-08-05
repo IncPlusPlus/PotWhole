@@ -28,6 +28,23 @@ public class ReportItem {
         this.imageUrl = imageUrl;
     }
 
+    public String toString() {
+        return id
+                + "\n"
+                + timeSubmitted
+                + "\n"
+                + submitterId
+                + "\n"
+                + description
+                + "\n"
+                + submitterId
+                + "\n"
+                + coordinates
+                + "\n"
+                + imageUrl
+                + "\n";
+    }
+
     public String getId() {
         return id;
     }

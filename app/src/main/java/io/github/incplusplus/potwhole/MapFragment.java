@@ -27,9 +27,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.functions.FirebaseFunctions;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -46,6 +52,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment supportMapFragment;
     private Context context;
     private LocationRequest locationRequest;
+    private ArrayList<Map<String, String>> convert = new ArrayList<>();
+    private ArrayList<Map<String, Map<String, Object>>> convertLoc = new ArrayList<>();
+    private List<ReportItem> reports = new ArrayList<ReportItem>();
 
     public MapFragment() {}
 
@@ -178,6 +187,59 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationRequest.setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
+    private void addReportsMarkers() {
+        FirebaseFunctions mFunctions = FirebaseFunctions.getInstance();
+        Log.v("REPORT_GET", "Getting all reports from database...");
+
+        mFunctions
+                .getHttpsCallable("getAllReportDocuments")
+                .call()
+                .addOnFailureListener(
+                        e -> {
+                            Log.v("REPORT_GET", "Getting Report Document Failed");
+                            Log.v("REPORT_GET", "Exception - " + e);
+                        })
+                .addOnSuccessListener(
+                        httpsCallableResult -> {
+                            Log.v("REPORT_GET", "Getting Report Document Successful");
+                            Log.v(
+                                    "REPORT_GET",
+                                    "Return From Database - " + httpsCallableResult.getData());
+                            ArrayList arr;
+
+                            arr = (ArrayList) httpsCallableResult.getData();
+
+                            ArrayList<Map<String, String>> convert = arr;
+                            ArrayList<Map<String, Map<String, Object>>> convertLoc = arr;
+
+                            for (int i = 0; i < convert.size(); i++) {
+                                double latitude =
+                                        (double) convertLoc.get(i).get("location").get("latitude");
+                                double longitude =
+                                        (double) convertLoc.get(i).get("location").get("longitude");
+
+                                ReportItem item =
+                                        new ReportItem(
+                                                convert.get(i).get("title"),
+                                                convert.get(i).get("timestamp"),
+                                                convert.get(i).get("originalReporterUsername"),
+                                                convert.get(i).get("description"),
+                                                new LatLng(latitude, longitude),
+                                                convert.get(i).get("image"));
+                                Log.v("ITEM", item.toString());
+
+                                map.addMarker(
+                                        new MarkerOptions()
+                                                .position(item.getCoordinates())
+                                                .title(item.getId())
+                                                .icon(
+                                                        BitmapDescriptorFactory.defaultMarker(
+                                                                BitmapDescriptorFactory
+                                                                        .HUE_VIOLET)));
+                            }
+                        });
+    }
+
     @SuppressLint("MissingPermission")
     private void startLocationUpdates(
             LocationCallback locationCallback, LocationRequest locationRequest) {
@@ -197,19 +259,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.map = googleMap;
         updateLocationUI();
         getDeviceLocation();
+        addReportsMarkers();
     }
     /*
     Called in the LocationCallback when a new location is returned
      */
     private void onNewLocation(@NonNull Location location) {
-        // Only move the camera when the new location is more than 5 meters from the old one
-        if (location.distanceTo(lastKnownLocation) >= 5) {
-            lastKnownLocation = location;
-            locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (lastKnownLocation != null) {
+            // Only move the camera when the new location is more than 5 meters from the old one
+            if (location.distanceTo(lastKnownLocation) >= 5) {
+                lastKnownLocation = location;
+                locationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-            // if callback is run before map is ready, map will be null
-            if (map != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, DEFAULT_ZOOM));
+                // if callback is run before map is ready, map will be null
+                if (map != null) {
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, DEFAULT_ZOOM));
+                }
             }
         }
     }
@@ -232,7 +297,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 new LocationCallback() {
                     @Override
                     public void onLocationResult(@NonNull LocationResult locationResult) {
-                        Log.d("Location callback called", TAG);
+                        Log.i("Location callback called", TAG);
                         onNewLocation(Objects.requireNonNull(locationResult.getLastLocation()));
                     }
                 };
@@ -248,7 +313,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     intent.putExtra("location", lastKnownLocation);
                     startActivity(intent);
                 });
-
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.map_fragment, supportMapFragment)
