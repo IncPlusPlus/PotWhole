@@ -1,12 +1,14 @@
 package io.github.incplusplus.potwhole;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class ReportItem {
     private String id;
     private String timeSubmitted;
     private String submitterId;
     private String description;
     // This will probably be the LatLng type once #6 is merged and the library becomes available
-    private String coordinates;
+    private LatLng coordinates;
     private String imageUrl;
 
     public ReportItem() {}
@@ -16,7 +18,7 @@ public class ReportItem {
             String timeSubmitted,
             String submitterId,
             String description,
-            String coordinates,
+            LatLng coordinates,
             String imageUrl) {
         this.id = id;
         this.timeSubmitted = timeSubmitted;
@@ -58,11 +60,11 @@ public class ReportItem {
         this.description = description;
     }
 
-    public String getCoordinates() {
+    public LatLng getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(String coordinates) {
+    public void setCoordinates(LatLng coordinates) {
         this.coordinates = coordinates;
     }
 

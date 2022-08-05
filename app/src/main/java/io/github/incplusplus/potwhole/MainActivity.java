@@ -1,5 +1,6 @@
 package io.github.incplusplus.potwhole;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "PotWhole";
     private MapFragment mapFragment;
+    private Location lastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

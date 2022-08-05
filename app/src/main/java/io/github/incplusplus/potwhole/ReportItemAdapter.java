@@ -3,7 +3,9 @@ package io.github.incplusplus.potwhole;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -19,19 +22,33 @@ import java.util.List;
 
 public class ReportItemAdapter extends ArrayAdapter<ReportItem> {
     private LayoutInflater inflater;
+    private Location lastKnownLocation;
     Bitmap bitmap;
     ImageView image;
     String urlImage;
+    Location reportLocation;
 
-    public ReportItemAdapter(@NonNull Context context, int resource, List<ReportItem> list) {
+    public ReportItemAdapter(
+            @NonNull Context context,
+            int resource,
+            List<ReportItem> list,
+            Location lastKnownLocation) {
         super(context, resource, list);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.lastKnownLocation = lastKnownLocation;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the report item
         ReportItem item = getItem(position);
         urlImage = item.getImageUrl();
+        LatLng reportLatLng = item.getCoordinates();
+        Log.d(String.valueOf(reportLatLng), "report location");
+        reportLocation = new Location("reportLocation");
+        reportLocation.setLatitude(reportLatLng.latitude);
+        reportLocation.setLongitude(reportLatLng.longitude);
+
+        Log.d(String.valueOf(lastKnownLocation), "last location");
 
         // Use the report_item layout to create a view
         View view = inflater.inflate(R.layout.report_item, null);
@@ -47,7 +64,14 @@ public class ReportItemAdapter extends ArrayAdapter<ReportItem> {
 
         TextView secondaryText = view.findViewById(R.id.report_secondary_text);
         // TODO: Make some sort of way to show the distance from the last recorded GPS coordinates
-        secondaryText.setText("0.51 mi away");
+        if (lastKnownLocation != null) {
+            float distance = reportLocation.distanceTo(lastKnownLocation);
+            float distance_miles = (float) (distance / 1609.344);
+
+            secondaryText.setText(String.format("%.2f miles away", distance_miles));
+        } else {
+            secondaryText.setText("unable to get distance from report");
+        }
 
         TextView supportingText = view.findViewById(R.id.report_supporting_text);
         // TODO: Truncate and add an ellipse after a certain # of chars.
