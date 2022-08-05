@@ -13,13 +13,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.functions.FirebaseFunctions;
+import java.util.Map;
 
 public class MyAccountFragment extends Fragment {
 
     private FirebaseAuth mAuth;
 
+    private FirebaseFunctions mFunctions;
+
     private EditText editTextEmail, editTextPassword;
+
+    private TextView username;
 
     public MyAccountFragment() {
         // Required empty public constructor
@@ -61,34 +69,49 @@ public class MyAccountFragment extends Fragment {
 
             createAccount.setOnClickListener(
                     v -> {
-                        Intent intent = new Intent(getActivity(), RegisterAccountPage.class);
-                        startActivity(intent);
+                        // Create new fragment and transaction
+                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                        FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        transaction.replace(R.id.container, RegisterAccountFragment.class, null);
+
+                        transaction.commit();
                     });
 
         } else {
             Button signOutButton = requireView().findViewById(R.id.sign_out_button);
 
-            Button updateAccountButton = requireView().findViewById(R.id.update_account_button);
+            username = requireView().findViewById(R.id.username);
 
-            Button functionButton = requireView().findViewById(R.id.functions);
+            mFunctions = FirebaseFunctions.getInstance();
+
+            mFunctions
+                    .getHttpsCallable("getUserDocument")
+                    .call()
+                    .addOnFailureListener(
+                            e -> {
+                                Log.v("USER_DOC_GET", "Getting User Document Failed");
+                                Log.v("USER_DOC_GET", "Exception - " + e);
+                            })
+                    .addOnSuccessListener(
+                            httpsCallableResult -> {
+                                Log.v("USER_DOC_GET", "Getting User Document Successful");
+                                Log.v(
+                                        "USER_DOC_GET",
+                                        "Return From Database - " + httpsCallableResult.getData());
+
+                                Map<String, Object> data =
+                                        (Map<String, Object>) httpsCallableResult.getData();
+
+                                Log.v("USERNAME", data.get("username").toString());
+
+                                username.setText(data.get("username").toString());
+                            });
 
             signOutButton.setOnClickListener(
                     v -> {
                         mAuth.signOut();
 
                         Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
-                    });
-
-            updateAccountButton.setOnClickListener(
-                    v -> {
-                        Intent intent = new Intent(getActivity(), UpdateAccount.class);
-                        startActivity(intent);
-                    });
-
-            functionButton.setOnClickListener(
-                    v -> {
-                        Intent intent = new Intent(getActivity(), FirebaseFunctionExample.class);
                         startActivity(intent);
                     });
         }

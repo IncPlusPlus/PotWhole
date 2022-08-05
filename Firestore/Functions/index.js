@@ -28,6 +28,12 @@ exports.updateUserDocument = functions.https.onCall(async (data, context) => {
 
         const documentGrab = await database.collection('users').doc(uid).get();
 
+        while(documentGrab.data().email == undefined){
+
+            documentGrab = await database.collection('users').doc(uid).get();
+
+        };
+
         await database.collection('users').doc(uid.toString()).set({
             email: documentGrab.data().email,
             username: dataField.username,
@@ -52,11 +58,8 @@ exports.getUserDocument = functions.https.onCall(async (data, context) => {
 
     // perform function on the condition that uid is not undefined
     if (uid != undefined) {
-        //Parse data sent to database from application instance
-        const dataField = JSON.parse(data);
-
         // Retrive the document with the uid identifier
-        const documentGrab = await database.collection('users').doc(dataField.uid).get();
+        const documentGrab = await database.collection('users').doc(uid).get();
 
         // Build the return data, including relevant information
         userData = {
@@ -64,10 +67,7 @@ exports.getUserDocument = functions.https.onCall(async (data, context) => {
         };
 
         // return the status of the function and relevant report data
-        return {
-            returnStatus: 'Existing report information from uid document has been returned to requesting user',
-            report: userData
-        };
+        return userData;
 
     } else {
         // return the status of the function that did not execute

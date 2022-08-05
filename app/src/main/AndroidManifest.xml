@@ -47,21 +47,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".RegisterAccountPage"
-            android:exported="true">
-        </activity>
-
-        <activity
-            android:name=".FirebaseFunctionExample"
-            android:exported="true">
-        </activity>
-
-        <activity
-            android:name=".UpdateAccount"
-            android:exported="true">
-        </activity>
-
     </application>
 
 </manifest>
