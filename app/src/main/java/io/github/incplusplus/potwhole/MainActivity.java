@@ -2,6 +2,8 @@ package io.github.incplusplus.potwhole;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -90,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
                                         e -> {
                                             Log.v("REPORT_GET", "Getting Report Document Failed");
                                             Log.v("REPORT_GET", "Exception - " + e);
+
+                                            Toast toast =
+                                                    Toast.makeText(
+                                                            MainActivity.this,
+                                                            "Please Ensure User is Signed-In",
+                                                            Toast.LENGTH_SHORT);
+                                            toast.show();
+
                                         })
                                 .addOnSuccessListener(
                                         httpsCallableResult -> {
